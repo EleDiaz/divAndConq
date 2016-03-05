@@ -1,0 +1,5 @@
+*.swp
+*.o
+_build
+_shake
+

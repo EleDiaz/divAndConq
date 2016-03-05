@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <tuple>
 #include "../Framework.hpp"
 
@@ -9,15 +10,13 @@ typedef int VAL;
 class MSData : public Problem, public Solution {
 private:
   TuplaXY xs;
-  vector<VAL> & vec;
+  vector<VAL> * vec;
 public:
-  vector<VAL>& getVec() {
+  vector<VAL>* getVec() {
+    //cout << "getVec" << endl;
     return vec;
   }
 
-  void setVec(const vector<VAL>& vec) {
-    this->vec = vec;
-  }
 
   const TuplaXY getXs() const {
     return xs;
@@ -27,21 +26,35 @@ public:
     this->xs = xs;
   }
 
-  MSData(TuplaXY xs, vector<VAL> & vec):
+  MSData(const MSData & data):
+    xs(data.xs), vec(data.vec)
+  {}
+
+  MSData(vector<VAL> * vec):
+    xs(pair<int, int>{0, vec->size()-1}),
+    vec(vec)
+  {}
+
+  MSData(TuplaXY xs, vector<VAL> * vec):
     xs(xs), vec(vec)
   {}
+
+  MSData operator=(const MSData & data) {
+    return data;
+  }
+
 };
 
 
-class MergeSort : public DivAndConquer {
+class MergeSort : public DivAndConquer<MSData, MSData> {
 private:
-  Solution combine(Problem p, vector<Solution> ss);
+  MSData combine(MSData p, vector<MSData> ss);
 
-  bool isSimple(Problem p);
+  bool isSimple(MSData p);
 
-  Solution simplySolve(Problem p);
+  MSData simplySolve(MSData p);
 
-  vector<Problem> decompose(Problem p);
+  vector<MSData *> decompose(MSData p);
 
   int min(int a, int b) { return (a>b)?b:a; }
 public:
@@ -49,73 +62,66 @@ public:
   void sort(vector<VAL> & vec);
 };
 
-bool MergeSort::isSimple(Problem p) {
-  MSData * data = static_cast<MSData *>(&p);
-  return data->getVec().size() <= 2;
+bool MergeSort::isSimple(MSData data) {
+  return (data.getXs().second - data.getXs().first) <= 2;
 }
 
-Solution MergeSort::simplySolve(Problem p) {
-  MSData * data = static_cast<MSData *>(&p);
-  if (data->getVec().at(data->getXs().first)
+MSData MergeSort::simplySolve(MSData data) {
+
+  if (data.getVec()->at(data.getXs().first)
       >
-      data->getVec().at(data->getXs().second)) {
+      data.getVec()->at(data.getXs().second)) {
 
-    VAL aux = data->getVec().at(data->getXs().first);
-    data->getVec().at(data->getXs().first) = data->getVec().at(data->getXs().second);
-    data->getVec().at(data->getXs().second) = aux;
+    VAL aux = data.getVec()->at(data.getXs().first);
+    data.getVec()->at(data.getXs().first) = data.getVec()->at(data.getXs().second);
+    data.getVec()->at(data.getXs().second) = aux;
   }
-  return (Solution)*data;
+  return data;
 }
 
-Solution MergeSort::combine(Problem p, vector<Solution> ss) {
+MSData MergeSort::combine(MSData p, vector<MSData> ss) {
   if (ss.size() != 2) {
     throw "Todo falla";
   };
-  vector<VAL> vec = ((MSData *)&p)->getVec();
-  TuplaXY xs = ((MSData *)&ss.at(0))->getXs();
-  TuplaXY ys = ((MSData *)&ss.at(1))->getXs();
+  vector<VAL>& vec = *p.getVec();
+  TuplaXY xs = ss.at(0).getXs();
+  TuplaXY ys = ss.at(1).getXs();
   int i = xs.first;
   int j = ys.first;
   vector<int> vecAux;
   vecAux.resize(ys.second-xs.first+1);
   for (unsigned k = 0; k<vecAux.size(); k++) {
-    // trace("Valores: [" << i << ":" << j << "]" << endl;)
     if (i > xs.second) {
-      // trace("j++ "<<j+1<<endl);
       vecAux[k] = vec[j];
       j++;
     }
     else if (j > ys.second) {
-      // trace("i++ "<< i+1<< endl);
       vecAux[k] = vec[i];
       i++;
     }
     else if (vec[i] < vec[j]) {
-      // trace("i++ "<< i+1<<endl);
       vecAux[k] = vec[i];
       i++;
     }
     else {
-      // trace("j++ " << j+1 << endl);
       vecAux[k] = vec[j];
       j++;
     }
-    // trace("VecAux: " << vecAux << endl);
   }
-  // trace("sub-Vector [ ");
   for (unsigned i=0; i<vecAux.size();i++) {
     vec[xs.first+i]=vecAux[i];
-    // trace(vecAux[i] << " ");
   }
-  // trace("]" << endl);
-  return (Solution)MSData(pair<int, int> {xs.first,ys.second}, vec);
+  cout << "join  " << vec << endl;
+  return MSData(pair<int, int> {xs.first,ys.second}, &vec);
 }
 
-vector<Problem> MergeSort::decompose(Problem p) {
-  MSData * data = static_cast<MSData *>(&p);
-  vector<Problem> result(2);
-  int middle = data->getXs().first + (data->getXs().second - data->getXs().first) / 2;
-  result[0] = (Problem)MSData(pair<int, int> {data->getXs().first, middle}, data->getVec());
-  result[1] = (Problem)MSData(pair<int, int> {middle+1, data->getXs().second}, data->getVec());
+vector<MSData *> MergeSort::decompose(MSData data) {
+  cout << "decompose  " << *data.getVec() << endl;
+  int middle = data.getXs().first + (data.getXs().second - data.getXs().first) / 2;
+  cout << "en " << data.getXs().first << " y " << middle << endl;
+  cout << "en " << middle+1 << " y " << data.getXs().second << endl;
+  vector<MSData *> result(2);
+  result[0] = new MSData(pair<int, int> {data.getXs().first, middle}, data.getVec());
+  result[1] = new MSData(pair<int, int> {middle+1, data.getXs().second}, data.getVec());
   return result;
 }

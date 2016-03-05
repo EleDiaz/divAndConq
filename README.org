@@ -1,0 +1,22 @@
+* README
+
+** Construir el programa
+Es necesario instalar ghc+shake para compilar y conservar la organización actual de los archivos
+- El script en bash build.sh compilara el Build.hs y generara la herramienta, que nos permitirá
+  compilar y correr el programa, en el directorio _shake/build. Por defecto los argumentos pasados
+  al bash se transmitirán al programa de _shake/build
+
+- En caso de no tener el compilador, se puede ejecutar el _shake/build directamente. (No le he probado aún)
+
+- Para más información sobre los comando disponibles: _shake/build --help
+
+- NOTA: Para comprobar la parte depuración del programa "DEBUG" es necesario pasarle por parametros
+  "--debugger"
+
+- POSNOTA: shake no compilara, ni aplicara el "--debugger" si no se modifica un archivo. 
+  (Estoy pensando en como arreglarlo de forma "bonita")
+
+** Ejecutar el programa
+- El programa se almacena en la carpeta _build/ con nombre *run*.
+- NOTA: Por el momento el paso de argumentos no los puedo hacer de forma "amigable" con shake,
+  con lo que es necesario hacerlo manual.
