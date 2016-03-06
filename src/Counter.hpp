@@ -26,7 +26,7 @@ public:
         max = 0;
         accum = 0;
     }
-    
+
     Counter& operator++(int) {
         localAccum++;
         return *this;

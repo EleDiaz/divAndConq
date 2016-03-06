@@ -33,7 +33,6 @@ class DivAndConquer<Pro, Sol, IsSubtypesProblemAndSolution<Pro, Sol>> {
   Sol solve(Pro p) {
     vector<Pro *> pp;
     if (isSimple(p)) {
-      cout << "Is Simple" << endl;
       return simplySolve(p);
     }
     else  {
@@ -56,14 +55,3 @@ class DivAndConquer<Pro, Sol, IsSubtypesProblemAndSolution<Pro, Sol>> {
 
   virtual Sol combine(Pro p, vector<Sol> ss) = 0;
 };
-
-
-// 1 2 4 4 5   3 5 5 6
-
-// cojo y comparo 1 con el segundo
-
-
-// if (vec i > vec j)
-//   j quito vec j
-//   else
-//     ()

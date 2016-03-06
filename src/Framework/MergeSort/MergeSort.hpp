@@ -2,10 +2,11 @@
 #include <iostream>
 #include <tuple>
 #include "../Framework.hpp"
+#include "../../RandNum.hpp"
 
 typedef pair<int, int> TuplaXY;
 
-typedef int VAL;
+typedef RandNum VAL;
 
 class MSData : public Problem, public Solution {
 private:
@@ -111,15 +112,15 @@ MSData MergeSort::combine(MSData p, vector<MSData> ss) {
   for (unsigned i=0; i<vecAux.size();i++) {
     vec[xs.first+i]=vecAux[i];
   }
-  cout << "join  " << vec << endl;
+  //cout << "join  " << vec << endl;
   return MSData(pair<int, int> {xs.first,ys.second}, &vec);
 }
 
 vector<MSData *> MergeSort::decompose(MSData data) {
-  cout << "decompose  " << *data.getVec() << endl;
+  //cout << "decompose  " << *data.getVec() << endl;
   int middle = data.getXs().first + (data.getXs().second - data.getXs().first) / 2;
-  cout << "en " << data.getXs().first << " y " << middle << endl;
-  cout << "en " << middle+1 << " y " << data.getXs().second << endl;
+  //cout << "en " << data.getXs().first << " y " << middle << endl;
+  //cout << "en " << middle+1 << " y " << data.getXs().second << endl;
   vector<MSData *> result(2);
   result[0] = new MSData(pair<int, int> {data.getXs().first, middle}, data.getVec());
   result[1] = new MSData(pair<int, int> {middle+1, data.getXs().second}, data.getVec());

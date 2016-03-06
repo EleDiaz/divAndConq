@@ -1,4 +1,6 @@
 #include <iostream>
+#include <stdlib.h>     /* srand, rand */
+#include <time.h>       /* time */
 #include <cmath>
 #include <sstream>
 #include <iomanip>
@@ -6,13 +8,57 @@
 #include <vector>
 #include "Framework/Framework.hpp"
 #include "Framework/MergeSort/MergeSort.hpp"
+#include "Framework/StrassenMult/StrassenMult.hpp"
 
+#include "sort/Insertion.hpp"
+
+#include "Test.hpp"
 
 using namespace std;
 
-int main(int argc, char *argv[])
-{
-  vector<int> vec {9,8,7,56,4,2,1,47};
+Counter RandNum::counter;
+
+
+void testInsertion(int nPruebas, int step, int end) {
+  for (int i = step; i < end; i+=step) {
+    cout << i << " ";
+    for (int j = 0; j < nPruebas; j++) {
+      Vector<RandNum> data(i);
+      RandNum::counter.start();
+      Insertion<RandNum> insertion;
+      insertion.sort(data);
+      RandNum::counter.stop();
+    }
+    cout << RandNum::counter.getMin()
+         << " " << RandNum::counter.getAccum()/nPruebas
+         << " " << RandNum::counter.getMax() << endl;
+    RandNum::counter.reset();
+  }
+}
+
+
+void testMerge(int nPruebas, int step, int end) {
+  for (int i = step; i < end; i+=step) {
+    cout << i << " ";
+    for (int j = 0; j < nPruebas; j++) {
+      vector<RandNum> vec(i);
+      MSData data(&vec);
+      RandNum::counter.start();
+      MergeSort sorter;
+      sorter.solve(data);
+      RandNum::counter.stop();
+    }
+    cout << RandNum::counter.getMin()
+         << " " << RandNum::counter.getAccum()/nPruebas
+         << " " << RandNum::counter.getMax() << endl;
+    RandNum::counter.reset();
+  }
+}
+
+
+int main(int argc, char *argv[]) {
+#ifndef STATS
+  vector<RandNum> vec {9,8,7,56,4,2,1,47};
 
   MSData data (&vec);
   MergeSort sorter;
@@ -24,38 +70,22 @@ int main(int argc, char *argv[])
   }
   cout << endl;
 
-// #ifdef DEBUG
+  Matrix a = Matrix(4, 4, [] (int i, int j) { return RandNum();});
+  a.output();
+  Matrix b = Matrix(4, 4, [] (int i, int j) { return RandNum();});
+  b.output();
+  StrassenMult multiplier;
 
-//   if (argc == 2) {
-//     Vector<DNI> vec(10);
-//     cout << vec << endl;
-//     sorters[stoi(argv[1])]->sort(vec);
-//     cout << vec << endl;
-//     cout << (sorters[0]->isSorted(vec)?
-//              "Esta Ordenado" : "No Esta Ordenado") << endl;
-//   }
-//   else {
-//     cout << "Format input is the following:\n"
-//          << "\t ./program_name ord_choose\n\n"
-//          << "\tord_choose : Int\n"
-//          << "\tord_choose posibilities:\n"
-//          << "\t\t\t0 -> Seletion, 1 -> Insertion, 2 -> QuickSort,\n"
-//          << "\t\t\t3 -> MergeSort, 4 -> ShellSort, 5 -> RadixSort\n" << endl;
-//   }
+  multiplier.solve(MultMatrix(a, b)).output();
+#else
+  srand (time(NULL));
 
-// #else
-
-//   if (argc == 3) {
-//     //testSet(stoi(argv[1]), stoi(argv[2]), sorters);
-//   }
-//   else {
-//     cout << "Format input is the following:\n"
-//          << "\t ./program_name number_test size_to_sort\n\n"
-//          << "\tnumber_test, size_to_sort : Int\n" << endl;
-//   }
-
-// #endif
-//   //sorters.map([](Ordering<DNI> * ord) { delete ord; return nullptr;});
-//   return 0;
+  cout << "Algoritmos de ordenacion usando 15 pruebas por tamanio" << endl;
+  cout << "MergeSort" << endl;
+  testMerge(10, 10, 300);
+  cout << "Insertion" << endl;
+  testInsertion(10, 10, 300);
+#endif
+  return 0;
 }
 

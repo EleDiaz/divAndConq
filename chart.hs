@@ -32,18 +32,18 @@ parsePlot = do
   return $ DataPlot title listPoints
 
   where
-    words = concat <$> many1 (many1 alphaNum <|> (many1 $ char ' '))
+    words = concat <$> many1 (many1 alphaNum <|> string "ñ" <|> (many1 $ char ' '))
     int   = read <$> many1 digit
 
 errbars :: String -> [(Int,Int,Int,Int)] -> EC l2 (PlotErrBars Int Int)
 errbars title vals = liftEC $ do
   c <- takeColor
   plot_errbars_values .= [asymetricErrPoint size med min max | (size,min,med,max) <- vals]
-  plot_errbars_title .= title
+  plot_errbars_title .= "Rango max y min"
   plot_errbars_line_style . line_color .= c
 
   where
-    asymetricErrPoint x y min max = ErrPoint (ErrValue (x-2) x (x+2)) (ErrValue min y max)
+    asymetricErrPoint x y min max = ErrPoint (ErrValue (x) x (x)) (ErrValue min y max)
 
 main :: IO ()
 main = do
@@ -57,3 +57,20 @@ main = do
        layout_title .= title dPlot
        mapM_ (plot . uncurry errbars) (listPoints dPlot)
        mapM_ (plot . uncurry points . (\(name, points) -> (name, [(x,y) | (x,_,y,_) <- points]))) (listPoints dPlot)
+       mapM_ (plot . uncurry line . (\(name, points) -> (name, [[(x,y) | (x,_,y,_) <- points]]))) (listPoints dPlot)
+
+
+
+-- main :: IO ()
+-- main = do
+--   (file:_) <- getArgs
+--   eitherDPlot <- parseFromFile parsePlot file
+--   case eitherDPlot of
+--    Left err -> print err
+--    Right dPlot -> do
+--      toFile (FileOptions (800, 600) SVG) (title dPlot ++ ".svg") $ do
+--        setColors (map opaque [blue, red])
+--        layout_title .= title dPlot
+--        mapM_ (plot . uncurry errbars) (listPoints dPlot)
+--        mapM_ (plot . uncurry points . (\(name, points) -> (name, [(x,y) | (x,_,y,_) <- points]))) (listPoints dPlot)
+

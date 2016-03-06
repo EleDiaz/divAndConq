@@ -1,28 +1,57 @@
 #pragma once
+#include <iostream>
 #include <functional>
 #include <vector>
+#include "../Framework.hpp"
+#include "../../RandNum.hpp"
 
 using namespace std;
 
-typedef int VAL;
+typedef RandNum VAL;
 
-class Matrix {
+class Matrix : public Solution {
 private:
   vector<VAL> rawData;
   int m; // columnas
   int n; // filas
 public:
 
-  Matrix(void): rawData() {
+  Matrix(void): rawData(), m(0), n(0) {
   }
 
-  Matrix(int m, int n): rawData(m*n) {
+  Matrix(int m, int n): rawData(m*n), m(m), n(n) {
   }
 
-  Matrix(int m, int n, function<VAL (int i, int j)> fun): rawData(m*n) {
-    for (int i = 0; i < m; i++) {
-      for (int j = 0; j < n; j++) {
+  Matrix(int m, int n, function<VAL (int i, int j)> fun): rawData(m*n), m(m), n(n) {
+    for (int i = 1; i <= m; i++) {
+      for (int j = 1; j <= n; j++) {
         set(i, j, fun(i, j));
+      }
+    }
+  }
+
+  Matrix(int m, int n, Matrix a11, Matrix a12, Matrix a21, Matrix a22): rawData(m*n), m(m), n(n) {
+    for (int i = 1; i <= m/2; i++) {
+      for (int j = 1; j <= n/2; j++) {
+        set(i, j, a11.get(i, j));
+      }
+    }
+
+    for (int i = m/2+1; i <= m; i++) {
+      for (int j = 1; j <= n/2; j++) {
+        set(i, j, a12.get(i-(m/2), j));
+      }
+    }
+
+    for (int i = 1; i <= m/2; i++) {
+      for (int j = n/2+1; j <= n; j++) {
+        set(i, j, a21.get(i, j-(n/2)));
+      }
+    }
+
+    for (int i = m/2+1; i <= m; i++) {
+      for (int j = n/2+1; j <= n; j++) {
+        set(i, j, a22.get(i-(m/2), j-(n/2)));
       }
     }
   }
@@ -36,11 +65,11 @@ public:
   }
 
   VAL get(int i, int j) const {
-    return rawData[i+(j*m)];
+    return rawData[(i-1)+((j-1)*m)];
   }
 
   void set(int i, int j, VAL elem) {
-    rawData[i+(j*m)] = elem;
+    rawData[(i-1)+((j-1)*m)] = elem;
   }
 
   Matrix getMatrixSquare(int sectorI, int sectorJ) {
@@ -59,6 +88,17 @@ public:
     return Matrix(m, n, [=] (int i, int j) {
         return get(i, j) - mat.get(i, j);
       });
+  }
+
+  void output(void) {
+    cout << "Matrix" << endl;
+    for (int i = 1; i <= m; i++) {
+      cout << "{ ";
+      for (int j = 1; j <= n; j++) {
+        cout << get(i, j) << " ";
+      }
+      cout << "}" << endl;
+    }
   }
 
   // Matrix overSquare(int i, int j, Matrix...Ops...Matrix);
