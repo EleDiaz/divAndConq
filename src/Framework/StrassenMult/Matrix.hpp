@@ -12,8 +12,8 @@ typedef RandNum VAL;
 class Matrix : public Solution {
 private:
   vector<VAL> rawData;
-  int m; // columnas
-  int n; // filas
+  int m; // filas
+  int n; // columnas
 public:
 
   Matrix(void): rawData(), m(0), n(0) {
@@ -39,13 +39,13 @@ public:
 
     for (int i = m/2+1; i <= m; i++) {
       for (int j = 1; j <= n/2; j++) {
-        set(i, j, a12.get(i-(m/2), j));
+        set(i, j, a21.get(i-(m/2), j));
       }
     }
 
     for (int i = 1; i <= m/2; i++) {
       for (int j = n/2+1; j <= n; j++) {
-        set(i, j, a21.get(i, j-(n/2)));
+        set(i, j, a12.get(i, j-(n/2)));
       }
     }
 
@@ -65,16 +65,16 @@ public:
   }
 
   VAL get(int i, int j) const {
-    return rawData[(i-1)+((j-1)*m)];
+    return rawData[(i-1)+((j-1)*n)];
   }
 
   void set(int i, int j, VAL elem) {
-    rawData[(i-1)+((j-1)*m)] = elem;
+    rawData[(i-1)+((j-1)*n)] = elem;
   }
 
   Matrix getMatrixSquare(int sectorI, int sectorJ) {
     return Matrix(m/2, n/2, [=] (int i, int j) {
-        return get(i*sectorI, j*sectorJ);
+        return get(i+(sectorI-1)*n/2, j+(sectorJ-1)*m/2);
       });
   }
 
@@ -93,11 +93,27 @@ public:
   void output(void) {
     cout << "Matrix" << endl;
     for (int i = 1; i <= m; i++) {
-      cout << "{ ";
       for (int j = 1; j <= n; j++) {
         cout << get(i, j) << " ";
       }
-      cout << "}" << endl;
+      cout << endl;
+    }
+  }
+
+  void resize(int m, int n) {
+    if (m == getM() && n == getN()) {
+      return;
+    }
+    else {
+      Matrix aux = Matrix(m, n, [=] (int i, int j) {
+          if (getM()>=i && getN()>=j)
+            return get(i,j);
+          else
+            return VAL(0);
+        });
+      this->rawData = aux.rawData;
+      this->m       = aux.m;
+      this->n       = aux.n;
     }
   }
 

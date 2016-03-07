@@ -33,51 +33,28 @@ public:
 
 
 bool StrassenMult::isSimple(MultMatrix data) {
-  return (data.getM() == 2 && data.getN() == 2);
+  return (data.getM() == 1 && data.getN() == 1);
 }
 
 Matrix StrassenMult::simplySolve(MultMatrix problem) {
   Matrix a = problem.getLeftMat();
   Matrix b = problem.getRightMat();
-  //cout << "Simply solve" << endl;
-  //a.output();
-  //b.output();
-  RandNum m1 = (a.get(1, 1) + a.get(2, 2)) * (b.get(1, 1) + b.get(2, 2));
-
-  RandNum m2 = (a.get(2, 1) + a.get(2, 2)) * b.get(1, 1);
-
-  RandNum m3 = a.get(1, 1) * (b.get(1, 2) - b.get(2, 2));
-
-  RandNum m4 = a.get(2, 2) * (b.get(2, 1) - b.get(1, 1));
-
-  RandNum m5 = (a.get(1, 1) + a.get(1, 2)) * b.get(2, 2);
-
-  RandNum m6 = (a.get(2, 1) - a.get(1, 1)) * (b.get(1, 1) + b.get(1, 2));
-
-  RandNum m7 = (a.get(1, 2) - a.get(2, 2)) * (b.get(2, 1) + b.get(2, 2));
-
-  Matrix c(2,2);
-  c.set(1, 1, m1 + m4 - m5 + m7);
-  c.set(1, 2, m3 + m5);
-  c.set(2, 1, m2 + m4);
-  c.set(2, 2, m1 - m2 + m3 + m6);
-  //c.output();
-  return c;
+  return Matrix(1, 1, [=] (int,int) { return a.get(1, 1) * b.get(1, 1);});
 }
 
 Matrix StrassenMult::combine(MultMatrix p, vector<Matrix> ss) {
   Matrix c11 = ss[0].sum(ss[3]).subtract(ss[4]).sum(ss[6]);
-  //cout << "c11" << endl;
-  //c11.output();
+  cout << "c11" << endl;
+  c11.output();
   Matrix c12 = ss[2].sum(ss[4]);
-  //cout << "c12" << endl;
-  //c12.output();
+  cout << "c12" << endl;
+  c12.output();
   Matrix c21 = ss[1].sum(ss[3]);
-  //cout << "c21" << endl;
-  //c21.output();
+  cout << "c21" << endl;
+  c21.output();
   Matrix c22 = ss[0].subtract(ss[1]).sum(ss[2]).sum(ss[5]);
-  //cout << "c22" << endl;
-  //c22.output();
+  cout << "c22" << endl;
+  c22.output();
   return Matrix(p.getM(), p.getN(), c11, c12, c21, c22);
 }
 
