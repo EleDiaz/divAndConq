@@ -1,4 +1,13 @@
-* README
+* Divide And Conquer
+
+Esta practica se ha desarrollado en c++, se trata del desarrollo de dos algoritmos: el de Strassen de multplicaciones
+y el mergesort(este está chungo, fue adapta de un código que hize anterior no recursivo).
+
+El framework lo único para lo que sirve es para establecer una relación entre ambos algoritmos, y varias restricciones
+en el problema y la solución del problema. Se hace un uso de c++11 y si intenta "emular" las clases de tipos de haskell.
+*Fracaso absoluto* queda una cochinada de código ininteligible y complejo, que espero no recordar otra vez.
+
+La práctica ha sido desarrollada como tarea de Diseño y Análisis de Algoritmos en la ULL.
 
 ** Construir el programa
 Es necesario instalar ghc+shake para compilar y conservar la organización actual de los archivos
